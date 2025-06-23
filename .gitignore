@@ -1,0 +1,14 @@
+# Ignore target directories in all sub-projects
+**/target/
+
+# Ignore typical Rust build artifacts
+**/*.pdb
+**/*.exe
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# If you use IDEs/editors
+.idea/
+.vscode/
