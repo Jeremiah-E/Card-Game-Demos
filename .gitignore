@@ -1,7 +1,7 @@
-# Ignore target directories in all sub-projects
+# Ignore build target directories in all sub-projects
 **/target/
 
-# Ignore typical Rust build artifacts
+# Ignore compiled files
 **/*.pdb
 **/*.exe
 
@@ -9,6 +9,5 @@
 .DS_Store
 Thumbs.db
 
-# If you use IDEs/editors
-.idea/
+# Incase I accidentally make a .vscode folder and forget to remove it
 .vscode/
