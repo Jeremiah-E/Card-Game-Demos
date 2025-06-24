@@ -2,7 +2,9 @@ mod helper;
 use helper::*;
 
 // Blackjack values. Not ideal, will improve upon later
-const CARD_VALS: [&[u8]; 13] = [&[1, 10], &[2], &[3], &[4], &[5], &[6], &[7], &[8], &[9], &[10], &[11], &[12], &[13]];
+const CARD_VALS_BLACKJACK: [&[u8]; 13] = [&[1, 10], &[2], &[3], &[4], &[5], &[6], &[7], &[8], &[9], &[10], &[10], &[10], &[10]];
+// War values. Aces high
+const CARD_VALS_WAR: [&[u8]; 13] = [&[13], &[1], &[2], &[3], &[4], &[5], &[6], &[7], &[8], &[9], &[10], &[11], &[12]];
 
 fn main() {
     println!("Hello, world! This is a test demo for trying out some basic ideas!");
@@ -19,5 +21,6 @@ fn main() {
 
     let card2 = Card::new(Face::Ace(), Suit::Clubs());
     // Not a very pretty line. Will make a .to_string(delimiter) for Vec<u8> later
-    println!("Say you pulled the card \x1b[33m{}\x1b[m and we're going with Blackjack rules. The value(s) would be \x1b[33m[{}]\x1b[m", card2.clone().to_short_string(), card2.get_values(CARD_VALS).iter().map(|n| n.to_string()).collect::<Vec<String>>().join("\x1b[m, \x1b[33m"));
+    println!("Say you pulled the card \x1b[33m{}\x1b[m and we're going with Blackjack rules. The value(s) would be \x1b[33m[{}]\x1b[m", card2.clone().to_short_string(), card2.clone().get_values(CARD_VALS_BLACKJACK).iter().map(|n| n.to_string()).collect::<Vec<String>>().join("\x1b[m, \x1b[33m"));
+    println!("In Warm the value is \x1b[33m{}\x1b[m", card2.get_values(CARD_VALS_WAR)[0]);
 }
