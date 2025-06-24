@@ -2,6 +2,7 @@ use rand::{rng, seq::SliceRandom};
 pub struct Deck {
     pub cards: Vec<Card>
 }
+#[derive(Clone)]
 pub struct Card {
     face: Face,
     suit: Suit
@@ -17,6 +18,9 @@ pub enum Face {
 
 
 impl Card {
+    pub fn get_values(self, face_values: [&[u8]; 13]) -> Vec<u8> {
+        return self.face.get_values(face_values);
+    }
     pub fn new(face: Face, suit: Suit) -> Card {
         return Card {face, suit};
     }
@@ -26,6 +30,23 @@ impl Card {
 }
 
 impl Face {
+    pub fn get_values(self, face_values: [&[u8]; 13]) -> Vec<u8> {
+        return match self {
+            Face::Ace() => {face_values[0]},
+            Face::Two() => {face_values[1]},
+            Face::Three() => {face_values[2]},
+            Face::Four() => {face_values[3]},
+            Face::Five() => {face_values[4]},
+            Face::Six() => {face_values[5]},
+            Face::Seven() => {face_values[6]},
+            Face::Eight() => {face_values[7]},
+            Face::Nine() => {face_values[8]},
+            Face::Ten() => {face_values[9]},
+            Face::Jack() => {face_values[10]},
+            Face::Queen() => {face_values[11]},
+            Face::King() => {face_values[12]},
+        }.to_vec();
+    }
     pub fn to_short_string(self) -> String {
         return match self {
             Face::Ace() => "A",
