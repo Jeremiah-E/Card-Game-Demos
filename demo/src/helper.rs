@@ -3,16 +3,16 @@ use rand::{rng, seq::SliceRandom};
 pub struct Deck {
     pub cards: Vec<Card>
 }
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Card {
     face: Face,
     suit: Suit
 }
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum Suit {
     Diamonds(), Spades(), Hearts(), Clubs()
 }
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum Face {
     Ace(), Two(), Three(), Four(), Five(), Six(), Seven(), Eight(), Nine(), Ten(), Jack(), Queen(), King()
 }

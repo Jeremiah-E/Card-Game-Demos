@@ -1,114 +1,115 @@
-// Warning, code below is AI-generated. Serves as a proof of concept that the helper code works and abstracts away deck manipulation
-
-// Remove comments to slow down the game
-
 mod helper;
 
+use std::cmp::Ordering;
 use helper::*;
-// use std::io::stdin;
 
 const CARD_VALS: [&[u8]; 13] = [ &[13], &[1], &[2], &[3], &[4], &[5], &[6], &[7], &[8], &[9], &[10], &[11], &[12] ];
 
+const PLAYER: u8 = 1;
+const OPPONENT: u8 = 2;
+const NONE: u8 = 3;
+
+
 fn main() {
+    // Initalize everything
     let mut deck = Deck::new();
     deck.shuffle();
+    let mut player;
+    let mut opponent;
+    { // Reduce namespace pollution
+        let len = deck.cards.len() as u16 / 2;
+        player = deck.draw(len);
+        opponent = deck.draw(len);
+        println!("Gave both players \x1b[33m{len}\x1b[m cards.");
+    }
+    
+    let mut winner = NONE;
+    while winner == NONE {
+        let mut player_heap = player.draw(1);
+        let mut opponent_heap = opponent.draw(1);
 
-    let mut opponent = deck.draw(52 / 2);
-    let mut player = deck.draw(52 / 2);
-    println!("Given both players {} cards", player.clone().cards.len());
-    // println!("Press enter to pass one round");
+        let pl_val = player_heap.cards[0].get_values(CARD_VALS)[0];
+        let op_val = opponent_heap.cards[0].get_values(CARD_VALS)[0];
 
-    let mut round = 1;
+        match pl_val.cmp(&op_val) {
+            // pl < op. Pl wins
+            Ordering::Less => {
+                println!("Your card: {}. Their card: {}", player_heap.cards[0].to_short_string(), opponent_heap.cards[0].to_short_string());
+                println!("You win!");
+                player.extend(player_heap);
+                player.extend(opponent_heap);
+                println!("New deck sizes: You: {}, Them: {}", player.cards.len(), opponent.cards.len());
+            },
+            // pl > op. Op wins
+            Ordering::Greater => {
+                println!("Your card: {}. Their card: {}", player_heap.cards[0].to_short_string(), opponent_heap.cards[0].to_short_string());
+                println!("Opponent wins!");
+                opponent.extend(player_heap);
+                opponent.extend(opponent_heap);
+                println!("New deck sizes: You: {}, Them: {}", player.cards.len(), opponent.cards.len());
+            },
+            // pl = op. War
+            Ordering::Equal => {
+                println!("Your card: {}. Their card: {}", player_heap.cards[0].to_short_string(), opponent_heap.cards[0].to_short_string());
+                println!("Both values are equal. WAR!");
+                
+                let mut tie = true;
+                // let mut pl_sum: u16;
+                // let mut op_sum: u16;
+                
+                while tie {
+                    if player.cards.len() < 3 {
+                        println!("You didn't have enough cards.");
+                        winner = OPPONENT;
+                        tie = false;
+                    } else if opponent.cards.len() < 3 {
+                        println!("They didn't have enough cards.");
+                        winner = PLAYER;
+                        tie = false;
+                    } else {
+                        player_heap.extend(player.draw(3));
+                        opponent_heap.extend(opponent.draw(3));
+                        let pl_sum: u16 = player_heap.cards.iter().rev().take(3)
+                        .map(|c| c.get_values(CARD_VALS)[0] as u16).sum();
 
-    while !player.cards.is_empty() && !opponent.cards.is_empty() {
-        // stdin().read_line(&mut String::new()).unwrap();
-        println!("\n--- Round {round} ---");
-
-        let player_card = player.draw(1).cards.pop().unwrap();
-        let opponent_card = opponent.draw(1).cards.pop().unwrap();
-
-        println!("You play: {}", player_card);
-        println!("Opponent plays: {}", opponent_card);
-
-        let player_value = player_card.clone().get_values(CARD_VALS)[0];
-        let opponent_value = opponent_card.clone().get_values(CARD_VALS)[0];
-
-        if player_value > opponent_value {
-            println!("You win the round!");
-            player.cards.insert(0, player_card);
-            player.cards.insert(0, opponent_card);
-        } else if player_value < opponent_value {
-            println!("Opponent wins the round!");
-            opponent.cards.insert(0, player_card);
-            opponent.cards.insert(0, opponent_card);
-        } else {
-            println!("WAR!");
-
-            let mut player_war_pile = vec![player_card];
-            let mut opponent_war_pile = vec![opponent_card];
-
-            // Check that both players have enough cards for war (3 down, 1 up)
-            if player.cards.len() < 4 || opponent.cards.len() < 4 {
-                println!("A player doesn't have enough cards for war!");
-
-                // Whoever can't continue loses
-                if player.cards.len() < 4 {
-                    opponent.cards.append(&mut player_war_pile);
-                    opponent.cards.append(&mut opponent_war_pile);
-                    opponent.cards.append(&mut player.cards);
-                    player.cards.clear();
-                } else {
-                    player.cards.append(&mut player_war_pile);
-                    player.cards.append(&mut opponent_war_pile);
-                    player.cards.append(&mut opponent.cards);
-                    opponent.cards.clear();
+                    let op_sum: u16 = opponent_heap.cards.iter().rev().take(3)
+                    .map(|c| c.get_values(CARD_VALS)[0] as u16).sum();
+                match pl_sum.cmp(&op_sum) {
+                    Ordering::Less => {
+                        // Pl wins
+                        tie = false; // Break the while loop
+                        player.extend(player_heap.clone());
+                        player.extend(opponent_heap.clone());
+                        println!("New deck sizes: You: {}, Them: {}", player.cards.len(), opponent.cards.len());
+                    },
+                    Ordering::Greater => {
+                        // Op wins
+                        tie = false; // Break the while loop
+                        opponent.extend(player_heap.clone());
+                        opponent.extend(opponent_heap.clone());
+                        println!("New deck sizes: You: {}, Them: {}", player.cards.len(), opponent.cards.len());
+                    },
+                    Ordering::Equal => {
+                        // Do nothing, continue
+                        tie = true;
+                    },
                 }
-                break;
-            }
-
-            // Burn 3 cards each
-            player_war_pile.extend(player.draw(3).cards);
-            opponent_war_pile.extend(opponent.draw(3).cards);
-
-            // Final face-up war card
-            let player_final = player.draw(1).cards.pop().unwrap();
-            let opponent_final = opponent.draw(1).cards.pop().unwrap();
-
-            println!(
-                "War card - You: {}, Opponent: {}",
-                player_final, opponent_final
-            );
-
-            player_war_pile.push(player_final.clone());
-            opponent_war_pile.push(opponent_final.clone());
-
-            let player_final_val = player_final.get_values(CARD_VALS)[0];
-            let opponent_final_val = opponent_final.get_values(CARD_VALS)[0];
-
-            if player_final_val > opponent_final_val {
-                println!("You win the war!");
-                player.extend(Deck {cards: opponent_war_pile.clone()});
-                player.extend(Deck {cards: player_war_pile.clone()});
-            } else {
-                println!("Opponent wins the war!");
-                opponent.extend(Deck {cards: player_war_pile.clone()});
-                opponent.extend(Deck {cards: opponent_war_pile.clone()});
             }
         }
+    },
+}
 
-        println!(
-            "You: {} cards, Opponent: {} cards",
-            player.cards.len(),
-            opponent.cards.len()
-        );
-
-        round += 1;
+if player.cards.len() == 0 {
+    winner = OPPONENT;
+} else if opponent.cards.len() == 0 {
+            winner = PLAYER;
+        }
     }
 
-    println!("\n=== Final Result ===");
-    if player.cards.is_empty() {
-        println!("You lose!");
-    } else {
-        println!("You win!");
+    match winner {
+        PLAYER => println!("You won!"),
+        OPPONENT => println!("You lost"),
+        _ => unreachable!()
     }
+
 }
