@@ -17,3 +17,4 @@ Eventually, I want to be able to make a new game solely by writing code in `main
 # Games made in the engine
 
 1. `Demo` - Not a game, but the first prototype for how I want the project to go
+2. `War` - Not particularely skill-based, but serves as a decent starter to a catalogue of games
