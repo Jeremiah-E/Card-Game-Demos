@@ -1,3 +1,4 @@
+use rand::{rng, seq::SliceRandom};
 pub struct Deck {
     pub cards: Vec<Card>
 }
@@ -14,9 +15,44 @@ pub enum Face {
     Ace(), Two(), Three(), Four(), Five(), Six(), Seven(), Eight(), Nine(), Ten(), Jack(), Queen(), King()
 }
 
+
 impl Card {
     pub fn new(face: Face, suit: Suit) -> Card {
         return Card {face, suit};
+    }
+    pub fn to_short_string(self) -> String {
+        return format!("{}{}", self.face.to_short_string(), self.suit.to_short_string());
+    }
+}
+
+impl Face {
+    pub fn to_short_string(self) -> String {
+        return match self {
+            Face::Ace() => "A",
+            Face::Two() => "2",
+            Face::Three() => "3",
+            Face::Four() => "4",
+            Face::Five() => "5",
+            Face::Six() => "6",
+            Face::Seven() => "7",
+            Face::Eight() => "8",
+            Face::Nine() => "9",
+            Face::Ten() => "10",
+            Face::Jack() => "J",
+            Face::Queen() => "Q",
+            Face::King() => "K",
+        }.to_string();
+    }
+}
+
+impl Suit {
+    pub fn to_short_string(self) -> String {
+        return match self {
+            Suit::Diamonds() => "♦",
+            Suit::Spades() => "♠",
+            Suit::Hearts() => "♥",
+            Suit::Clubs() => "♣",
+        }.to_string();
     }
 }
 
@@ -68,5 +104,9 @@ impl Deck {
             }
         }
         return Deck {cards};
+    }
+    pub fn shuffle(&mut self) {
+        let mut rng = rng();
+        self.cards.shuffle(&mut rng);
     }
 }
