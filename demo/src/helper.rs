@@ -94,6 +94,20 @@ impl std::fmt::Display for Face {
     }
 }
 impl Deck {
+    pub fn to_short_string(self, delimiter: &str) -> String {
+        let mut string = String::new();
+        for card in self.cards {
+            string.push_str(format!("{}{delimiter}", card.to_short_string()).as_str());
+        }
+        return string;
+    }
+    pub fn to_string(self, delimiter: &str) -> String {
+        let mut string = String::new();
+        for card in self.cards {
+            string.push_str(format!("{}{delimiter}", card.to_string()).as_str());
+        }
+        return string;
+    }
     pub fn new() -> Deck {
         let suits = [Suit::Clubs(), Suit::Diamonds(), Suit::Hearts(), Suit::Spades()];
         let faces = [Face::Ace(), Face::Two(), Face::Three(), Face::Four(), Face::Five(), Face::Six(), Face::Seven(), Face::Eight(), Face::Nine(), Face::Ten(), Face::Jack(), Face::Queen(), Face::King()];
